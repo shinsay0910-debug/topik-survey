@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Khảo sát chuyên gia TOPIK</title>
+<meta name="description" content="Bảng khảo sát chuyên gia đợt 1 – Hệ thống mã hóa nội dung nhạy cảm và cấm kỵ trong bối cảnh văn hóa – xã hội Việt Nam trong đề thi TOPIK">
+<style>
+:root{
+  --bg:#f6f5f1; --card:#ffffff; --ink:#1d2330; --muted:#5d6576; --line:#dcdad3;
+  --accent:#1f5fbf; --accent-soft:#e8f0fc; --ok:#2e7d4f; --warn:#b35c00; --focus:#0d3d8a;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15171c; --card:#1e2128; --ink:#e7e8eb; --muted:#a2a8b5; --line:#343844;
+    --accent:#7aa7ff; --accent-soft:#1d2a42; --ok:#6cc495; --warn:#f0a85a; --focus:#b9d0ff;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15171c; --card:#1e2128; --ink:#e7e8eb; --muted:#a2a8b5; --line:#343844;
+  --accent:#7aa7ff; --accent-soft:#1d2a42; --ok:#6cc495; --warn:#f0a85a; --focus:#b9d0ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Segoe UI",Roboto,"Noto Sans",Arial,sans-serif}
+.wrap{max-width:920px;margin:0 auto;padding:0 16px 80px}
+header.top{padding:40px 0 24px;border-bottom:3px solid var(--accent);margin-bottom:24px}
+header.top .kicker{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700}
+header.top h1{font-size:clamp(22px,4vw,30px);line-height:1.3;margin:6px 0 8px}
+header.top p{margin:0;color:var(--muted)}
+.progress{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line)}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.progress small{color:var(--muted);font-size:13px}
+section.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px;margin:20px 0}
+h2{font-size:20px;margin:0 0 12px;color:var(--accent)}
+h3{font-size:17px;margin:24px 0 10px}
+.note{color:var(--muted);font-size:15px}
+ol.purpose{padding-left:20px} ol.purpose li{margin:6px 0}
+label.field{display:block;font-weight:600;margin:18px 0 6px}
+.req{color:var(--accent)}
+input[type=text],textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:90px;resize:vertical}
+input:focus-visible,textarea:focus-visible,button:focus-visible,.opt input:focus-visible+span{outline:2px solid var(--focus);outline-offset:2px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;cursor:pointer;font-size:15px;background:var(--bg)}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.opt input{accent-color:var(--accent)}
+.other{margin-top:8px}
+.scale-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;background:var(--accent-soft);padding:10px 14px;border-radius:6px;margin:12px 0}
+.group{border-top:1px solid var(--line);padding-top:8px;margin-top:20px}
+.item{display:grid;grid-template-columns:70px 1fr;gap:4px 14px;padding:14px 0;border-bottom:1px dashed var(--line)}
+.item .code{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.item .title{font-weight:600}
+.item .crit{color:var(--muted);font-size:14.5px}
+.likert{grid-column:2;display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.likert label{display:flex;flex-direction:column;align-items:center;min-width:48px;padding:6px 4px;border:1px solid var(--line);border-radius:6px;cursor:pointer;font-size:13px;color:var(--muted);background:var(--bg)}
+.likert label b{font-size:16px;color:var(--ink)}
+.likert label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.likert input{position:absolute;opacity:0;width:1px;height:1px}
+.likert label:has(input:focus-visible){outline:2px solid var(--focus)}
+.item.missing{background:color-mix(in srgb,var(--warn) 10%,transparent)}
+.core-group{margin:14px 0}
+.core-group h4{margin:0 0 6px;font-size:15px}
+.chk{display:flex;gap:8px;align-items:flex-start;padding:4px 0;cursor:pointer}
+.chk input{margin-top:5px;accent-color:var(--accent)}
+.chk.disabled{opacity:.45;cursor:not-allowed}
+.counter{position:sticky;top:44px;z-index:4;display:inline-block;background:var(--accent);color:var(--card);padding:4px 12px;border-radius:999px;font-size:14px;font-weight:600}
+table.rev{width:100%;border-collapse:collapse;margin-top:10px}
+table.rev th,table.rev td{border:1px solid var(--line);padding:6px;vertical-align:top}
+table.rev th{background:var(--accent-soft);font-size:14px}
+table.rev input,table.rev textarea{min-height:40px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+button{font:inherit;padding:10px 18px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:var(--card);cursor:pointer;font-weight:600}
+button.ghost{background:transparent;color:var(--accent)}
+.msg{margin-top:14px;padding:12px 14px;border-radius:6px;display:none}
+.msg.show{display:block}
+.msg.err{background:color-mix(in srgb,var(--warn) 15%,transparent);border:1px solid var(--warn)}
+.msg.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);border:1px solid var(--ok)}
+footer{color:var(--muted);text-align:center;font-size:14px;margin-top:30px}
+@media (max-width:560px){
+  section.card{padding:16px}
+  .item{grid-template-columns:1fr}
+  .likert{grid-column:1}
+  .likert label{min-width:0;flex:1}
+  table.rev, table.rev tbody, table.rev tr, table.rev td{display:block;width:100%}
+  table.rev thead{display:none}
+  table.rev td::before{content:attr(data-label);display:block;font-size:13px;color:var(--muted);font-weight:600}
+}
+@media print{.progress,.actions,.counter{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div class="kicker">Bảng khảo sát chuyên gia đợt 1</div>
+  <h1>Hệ thống mã hóa các hạng mục nội dung nhạy cảm và cấm kỵ trong bối cảnh văn hóa – xã hội Việt Nam trong bộ câu hỏi thi TOPIK</h1>
+  <p>Thời gian dự kiến: khoảng 20–30 phút. Câu trả lời được tự động lưu tạm trên trình duyệt của Quý chuyên gia.</p>
+</header>
+
+<div class="progress" aria-hidden="true">
+  <div class="bar"><i id="barFill"></i></div>
+  <small id="barText">0%</small>
+</div>
+
+<form id="survey" novalidate>
+
+<section class="card">
+  <h2>Ⅰ. Mục đích khảo sát</h2>
+  <p>Khảo sát này nhằm mục đích đánh giá bộ câu hỏi thi TOPIK về mức độ phù hợp đối với bối cảnh văn hóa – xã hội Việt Nam. Để thực hiện mục tiêu này, nhóm nghiên cứu đã phân tích các văn bản pháp luật Việt Nam như Luật Giáo dục, Luật Xuất bản, Luật Báo chí, các quy định liên quan đến Chương trình đào tạo tiếng Hàn, v.v., từ đó xác định và mã hóa các hạng mục nội dung nhạy cảm hoặc cấm kỵ trong bối cảnh văn hóa – xã hội Việt Nam, đồng thời xây dựng các tiêu chí đánh giá cụ thể tương ứng với từng mã. Dựa trên ý kiến thẩm định của các chuyên gia, nhóm nghiên cứu sẽ kiểm tra và hoàn thiện để đảm bảo tính phù hợp của hệ thống mã hóa và các tiêu chí đánh giá cụ thể các hạng mục nội dung nhạy cảm, cấm kỵ được xây dựng.</p>
+  <p>Nội dung khảo sát cụ thể như sau:</p>
+  <ol class="purpose">
+    <li>Xem xét hệ thống mã phân loại hạng mục nội dung nhạy cảm và cấm kỵ được xác định từ các văn bản pháp luật và quy định của Việt Nam có hợp lý để sử dụng làm tiêu chí đánh giá mức độ phù hợp của các câu hỏi thi TOPIK trong bối cảnh văn hóa – xã hội Việt Nam hay không?</li>
+    <li>Ở từng hạng mục nội dung nhạy cảm và cấm kỵ, trên thực tế những chủ đề, nội dung, cách diễn đạt cụ thể nào cần đặc biệt lưu ý hoặc hạn chế khi biên soạn và thẩm định câu hỏi thi TOPIK?</li>
+    <li>Trong toàn bộ hệ thống mã phân loại nội dung nhạy cảm và cấm kỵ, những mã nào cần được đặc biệt ưu tiên xem xét khi đánh giá các câu hỏi thi TOPIK về mức độ phù hợp về văn hóa – xã hội Việt Nam?</li>
+    <li>Những hạng mục nội dung nào trong hệ thống mã phân loại và các tiêu chí đánh giá hiện nay cần được bổ sung, điều chỉnh, gộp hoặc loại bỏ?</li>
+  </ol>
+  <p>Kết quả khảo sát được sử dụng để chỉnh sửa và hoàn thiện hệ thống mã phân loại nội dung nhạy cảm, cấm kỵ cùng các tiêu chí đánh giá đợt 1 được xây dựng trên cơ sở phân tích văn bản pháp luật. Trên cơ sở đó nhóm nghiên cứu sẽ thiết lập bộ tiêu chí đánh giá cuối cùng để sử dụng cho việc phân tích mức độ phù hợp của các câu hỏi thi TOPIK trong bối cảnh văn hóa – xã hội Việt Nam.</p>
+  <p><strong>Xin chân thành cảm ơn Quý chuyên gia đã dành thời gian tham gia khảo sát.</strong></p>
+</section>
+
+<section class="card" id="sec2">
+  <h2>Ⅱ. Thông tin cơ bản của chuyên gia</h2>
+  <label class="field" for="org">1. Cơ quan/đơn vị công tác <span class="req">*</span></label>
+  <input type="text" id="org" name="org" required>
+
+  <div class="field" id="lbl-field">2. Lĩnh vực chuyên môn <span class="req">*</span> <span class="note">(có thể chọn nhiều)</span></div>
+  <div class="opts" role="group" aria-labelledby="lbl-field" id="opts-field"></div>
+  <input type="text" class="other" name="field_other" placeholder="Lĩnh vực khác (ghi rõ)">
+
+  <div class="field" id="lbl-exp">3. Kinh nghiệm làm việc trong lĩnh vực liên quan <span class="req">*</span></div>
+  <div class="opts" role="radiogroup" aria-labelledby="lbl-exp" id="opts-exp"></div>
+
+  <div class="field" id="lbl-topik">4. Kinh nghiệm liên quan đến TOPIK <span class="req">*</span> <span class="note">(có thể chọn nhiều)</span></div>
+  <div class="opts" role="group" aria-labelledby="lbl-topik" id="opts-topik"></div>
+  <input type="text" class="other" name="topik_other" placeholder="Các kinh nghiệm khác (ghi rõ)">
+</section>
+
+<section class="card" id="sec3">
+  <h2>Ⅲ. Đánh giá mức độ phù hợp của các mã phân loại nội dung nhạy cảm và cấm kỵ</h2>
+  <p>Các mã dưới đây được xây dựng trên cơ sở các văn bản pháp luật và quy định về chương trình đào tạo có liên quan của Việt Nam, nhằm phân loại những nội dung cần được lưu ý hoặc được xem là cấm kỵ về mặt văn hóa – xã hội.</p>
+  <p>Xin Quý chuyên gia đánh giá tính hợp lý của từng mã khi sử dụng làm tiêu chí đánh giá mức độ phù hợp về mặt văn hóa – xã hội Việt Nam của các câu hỏi thi TOPIK.</p>
+  <div class="scale-legend"><span><b>①</b> Hoàn toàn không phù hợp</span><span><b>②</b> Không phù hợp</span><span><b>③</b> Bình thường</span><span><b>④</b> Phù hợp</span><span><b>⑤</b> Rất phù hợp</span></div>
+  <div id="ratings"></div>
+</section>
+
+<section class="card" id="sec4">
+  <h2>Ⅳ. Lựa chọn các mã phân loại nội dung cốt lõi</h2>
+  <p>Trong số các hạng mục mã hóa dưới đây, xin Quý chuyên gia hãy chọn <strong>tối đa 5 mục</strong> mà Quý vị cho là cần phải được cân nhắc đặc biệt và quan trọng khi biên soạn, rà soát các câu hỏi của bài thi tiếng Hàn tại Việt Nam.</p>
+  <span class="counter" id="coreCount">Đã chọn 0/5</span>
+  <div id="core"></div>
+</section>
+
+<section class="card" id="sec5">
+  <h2>Ⅴ. Ý kiến bổ sung về bộ mã phân loại</h2>
+  <h3>1. Các loại hình nhạy cảm và điều cấm kỵ cần bổ sung</h3>
+  <p>Ngoài các mã phân loại nội dung cốt lõi được đưa ra, trong bối cảnh pháp lý hoặc văn hóa – xã hội của Việt Nam, Quý vị có cho rằng còn có nội dung nào liên quan đến sự nhạy cảm và điều cấm kỵ cần được xem xét bổ sung khi biên soạn hoặc rà soát các câu hỏi trong đề thi tiếng Hàn hay không?</p>
+  <div class="opts" role="radiogroup" aria-label="Cần bổ sung">
+    <label class="opt"><input type="radio" name="add_needed" value="Không"><span>Không</span></label>
+    <label class="opt"><input type="radio" name="add_needed" value="Có"><span>Có</span></label>
+  </div>
+  <div id="addBox">
+    <label class="field" for="add_content">Nội dung được cho là cần phải bổ sung (nếu có)</label>
+    <textarea id="add_content" name="add_content"></textarea>
+    <label class="field" for="add_reason">Lý do</label>
+    <textarea id="add_reason" name="add_reason"></textarea>
+  </div>
+
+  <h3>2. Các hạng mục mã cần được chỉnh sửa, gộp lại hoặc loại bỏ</h3>
+  <p>Trong số các hạng mục mã phân loại được đưa ra, xin Quý vị hãy viết ra mã nào có ý nghĩa không rõ ràng, phạm vi quá rộng hoặc quá hẹp, hoặc trùng lặp với các mã khác mà Quý vị cho là cần phải chỉnh sửa, tích hợp hoặc loại bỏ (nếu có).</p>
+  <table class="rev">
+    <thead><tr><th style="width:18%">Mã tương ứng</th><th>Ý kiến chỉnh sửa, tích hợp hoặc loại bỏ</th><th>Lý do</th></tr></thead>
+    <tbody id="revBody"></tbody>
+  </table>
+  <div class="actions" style="margin-top:10px"><button type="button" class="ghost" id="addRow">+ Thêm dòng</button></div>
+
+  <h3>3. Ý kiến khác</h3>
+  <label class="field" for="other_opinion" style="font-weight:400">Căn cứ theo bối cảnh pháp lý và văn hóa – xã hội của Việt Nam, nếu có các vấn đề cần lưu ý bổ sung khi đánh giá tính phù hợp về mặt nội dung của các câu hỏi trong đề thi tiếng Hàn, xin Quý vị hãy tự do trình bày.</label>
+  <textarea id="other_opinion" name="other_opinion"></textarea>
+</section>
+
+<section class="card">
+  <p><strong>Xin cảm ơn Quý vị vì đã tham gia khảo sát.</strong></p>
+  <div class="actions">
+    <button type="submit" id="submitBtn">Gửi khảo sát</button>
+  </div>
+  <div class="msg" id="msg" role="status" aria-live="polite"></div>
+</section>
+</form>
+<footer>© Nhóm nghiên cứu · Khảo sát chuyên gia đợt 1 (phiên bản 2026-10-08)</footer>
+</div>
+
+<script>
+/* ==========================================================
+   CẤU HÌNH — điền URL Web App của Google Apps Script vào đây
+   (xem README.md). Để trống: chỉ tải file câu trả lời.
+   ========================================================== */
+const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbyApRbHR8nCADAGsnIiRrea7XnIoAd8EJeXgUmBiIBrO5LM5nK97NeEfDRuM9itvkyTng/exec";
+
+const SURVEY_ID = "topik-vn-expert-round1";
+
+const FIELDS = ["Giáo dục tiếng Hàn","Giáo dục tiếng nước ngoài","Giáo dục học","Ngôn ngữ học","Hàn Quốc học","Văn hóa – xã hội Việt Nam","Chính sách pháp luật"];
+const EXPS = ["Dưới 5 năm","Từ 5 đến dưới 10 năm","Từ 10 đến dưới 15 năm","Từ 15 năm trở lên"];
+const TOPIKS = ["Biên soạn/thẩm định đề thi TOPIK","Tổ chức/quản lý kỳ thi TOPIK","Giảng dạy/luyện thi TOPIK","Đã dự thi TOPIK","Nghiên cứu liên quan đến TOPIK","Không có"];
+
+const GROUPS = [
+ {id:"V01",name:"Thể chế chính trị, chính sách và chủ quyền của Việt Nam",items:[
+  ["V01-1","Xuyên tạc chính sách và pháp luật Việt Nam","Các nội dung xuyên tạc hoặc trình bày sai sự thật về đường lối, chủ trương của Đảng, chính sách và pháp luật của Nhà nước."],
+  ["V01-2","Chống đối nhà nước và thể chế chính trị; phỉ báng chính quyền","Các nội dung chống đối Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam hoặc phỉ báng, phủ nhận chính quyền nhân dân."],
+  ["V01-3","Xuyên tạc hoặc thể hiện không chính xác chủ quyền của Việt Nam","Các nội dung xuyên tạc hoặc trình bày không chính xác về chủ quyền quốc gia Việt Nam."],
+  ["V01-4","Nội dung nhạy cảm liên quan đến an ninh quốc gia","Nội dung liên quan đến an ninh quốc gia mà theo quy định pháp luật cần được đặc biệt lưu ý hoặc xem xét, thẩm định."],
+  ["V01-5","Gây tổn hại đến quan hệ đối ngoại, vị thế quốc tế hoặc hình ảnh quốc gia","Nội dung gây phương hại đến chính sách đoàn kết quốc tế hoặc có tác động tiêu cực đến vị thế, uy tín hay hình ảnh quốc gia Việt Nam."]]},
+ {id:"V02",name:"Lịch sử dân tộc, cách mạng và các nhân vật lịch sử quốc gia",items:[
+  ["V02-1","Xuyên tạc sự thật lịch sử Việt Nam","Các nội dung xuyên tạc các sự kiện hoặc sự thật lịch sử Việt Nam."],
+  ["V02-2","Phủ nhận thành tựu lịch sử của cách mạng Việt Nam","Các nội dung phủ nhận những thành tựu hoặc công lao đạt được trong quá trình cách mạng Việt Nam."],
+  ["V02-3","Xúc phạm lãnh đạo quốc gia và các nhân vật lịch sử Việt Nam","Các nội dung mang tính xúc phạm đối với các nhà lãnh đạo quốc gia hoặc nhân vật lịch sử Việt Nam."],
+  ["V02-4","Xúc phạm cộng đồng dân tộc Việt Nam","Các nội dung xúc phạm hoặc hạ thấp cộng đồng dân tộc Việt Nam."]]},
+ {id:"V03",name:"Tôn giáo và tín ngưỡng",items:[
+  ["V03-1","Truyền bá tôn giáo, tín ngưỡng cụ thể","Các nội dung mang tính cưỡng ép truyền bá một tôn giáo hoặc tín ngưỡng cụ thể."],
+  ["V03-2","Định kiến, phân biệt đối xử liên quan đến tôn giáo, tín ngưỡng","Các nội dung thể hiện định kiến hoặc phân biệt đối xử đối với một tôn giáo, tín ngưỡng cụ thể."],
+  ["V03-3","Xúc phạm niềm tin tôn giáo","Các nội dung xúc phạm niềm tin của một tôn giáo hoặc tín ngưỡng cụ thể."],
+  ["V03-4","Kích động chia rẽ giữa các tôn giáo","Các nội dung gây chia rẽ giữa các tôn giáo hoặc tín ngưỡng."]]},
+ {id:"V04",name:"Các nhóm dân tộc, vùng miền và nhóm xã hội",items:[
+  ["V04-1","Định kiến hoặc phân biệt đối xử đối với một dân tộc cụ thể","Nội dung thể hiện định kiến hoặc phân biệt đối xử đối với một nhóm dân tộc cụ thể tại Việt Nam."],
+  ["V04-2","Kích động chia rẽ giữa các dân tộc","Nội dung kích động mâu thuẫn hoặc chia rẽ giữa các nhóm dân tộc, gây phương hại đến khối đoàn kết dân tộc."],
+  ["V04-3","Định kiến và phân biệt đối xử đối với vùng miền và người dân địa phương","Nội dung thể hiện định kiến hoặc phân biệt đối xử đối với một vùng miền hoặc người dân thuộc vùng miền cụ thể."],
+  ["V04-4","Kích động chia rẽ giữa các nhóm và tầng lớp xã hội","Nội dung kích động mâu thuẫn hoặc chia rẽ giữa các giai cấp, tầng lớp xã hội, giữa nhân dân với chính quyền hoặc giữa các tổ chức xã hội."],
+  ["V04-5","Định kiến và phân biệt đối xử dựa trên xuất thân","Nội dung phân biệt đối xử với cá nhân hoặc nhóm người vì nguồn gốc, xuất thân xã hội của họ."],
+  ["V04-6","Phân biệt đối xử đối với người khuyết tật","Nội dung thể hiện định kiến, kỳ thị hoặc phân biệt đối xử đối với người khuyết tật."],
+  ["V04-7","Phân biệt đối xử đối với nhóm yếu thế","Nội dung phân biệt đối xử hoặc đối xử bất lợi với cá nhân, nhóm người vì họ thuộc nhóm yếu thế trong xã hội."]]},
+ {id:"V05",name:"Định kiến và phân biệt đối xử về giới",items:[
+  ["V05-1","Định kiến về giới","Nội dung thể hiện định kiến đối với một giới cụ thể."],
+  ["V05-2","Phân biệt đối xử về giới","Nội dung phân biệt đối xử dựa trên giới."],
+  ["V05-3","Kích động sự thù địch giữa các giới","Nội dung gây ra hoặc kích động thái độ thù địch dựa trên sự khác biệt về giới."]]},
+ {id:"V06",name:"Định kiến về độ tuổi",items:[
+  ["V06-1","Định kiến về độ tuổi","Nội dung thể hiện định kiến đối với một độ tuổi hoặc nhóm tuổi cụ thể."]]},
+ {id:"V07",name:"Nghề nghiệp và địa vị xã hội",items:[
+  ["V07-1","Định kiến đối với nghề nghiệp hoặc người làm nghề cụ thể","Nội dung thể hiện định kiến đối với một nghề nghiệp cụ thể hoặc những người làm nghề đó."],
+  ["V07-2","Định kiến và phân biệt đối xử dựa trên địa vị xã hội","Nội dung thể hiện định kiến hoặc phân biệt đối xử dựa trên địa vị xã hội."]]},
+ {id:"V08",name:"Thuần phong mỹ tục, đạo đức và nội dung tính dục (hành vi đồi trụy)",items:[
+  ["V08-1","Tổn hại thuần phong mỹ tục","Nội dung làm tổn hại hoặc không phù hợp với thuần phong mỹ tục của Việt Nam."],
+  ["V08-2","Tổn hại và lan truyền nội dung vi phạm giá trị đạo đức","Trường hợp lan truyền các nội dung làm tổn hại đến các giá trị hoặc chuẩn mực đạo đức được xã hội coi là tốt đẹp, tích cực."],
+  ["V08-3","Truyền bá và tuyên truyền lối sống đồi trụy","Nội dung giới thiệu, truyền bá hoặc tuyên truyền các lối sống đồi trụy bị xã hội đánh giá tiêu cực, theo chiều hướng cho rằng đó là điều tốt đẹp hoặc đáng học hỏi, làm theo."],
+  ["V08-4","Miêu tả chi tiết hành vi đồi trụy","Nội dung miêu tả một cách cụ thể, chi tiết quá mức cần thiết về các hành vi đồi trụy hoặc hành vi tình dục."]]},
+ {id:"V09",name:"Mê tín dị đoan, hủ tục và gây hại cho xã hội",items:[
+  ["V09-1","Truyền bá và cổ súy mê tín, hủ tục","Nội dung truyền bá hoặc cổ súy cho mê tín dị đoan, hoặc các phong tục, thói hư tật xấu bị xã hội đánh giá là có hại hoặc tiêu cực."],
+  ["V09-2","Truyền bá thông tin gây bất ổn xã hội","Nội dung về các hiện tượng kỳ bí, khó lý giải coi như thể là sự thật, gây ra bất ổn xã hội hoặc ảnh hưởng tiêu cực đến trật tự xã hội, an toàn và sức khỏe cộng đồng."],
+  ["V09-3","Truyền bá hành vi gây hại cho xã hội","Nội dung truyền bá hoặc lan truyền các hành vi gây hại cho trật tự xã hội và cộng đồng."]]},
+ {id:"V10",name:"Bạo lực, tội phạm và chiến tranh",items:[
+  ["V10-1","Kích động bạo lực","Nội dung kích động các hành vi bạo lực."],
+  ["V10-2","Lan truyền và miêu tả chi tiết hành vi phạm tội","Nội dung lan truyền hoặc miêu tả quá mức chi tiết về các hành vi phạm tội."],
+  ["V10-3","Tuyên truyền, kích động chiến tranh xâm lược","Nội dung ủng hộ hoặc kích động tiến hành chiến tranh xâm lược."],
+  ["V10-4","Gây thù hằn giữa các dân tộc, quốc gia","Nội dung thể hiện một dân tộc hoặc công dân của một quốc gia cụ thể dưới lăng kính đối địch, hoặc khơi gợi sự thù địch."]]},
+ {id:"V11",name:"Danh dự, nhân phẩm, đời tư cá nhân và bóp méo thông tin",items:[
+  ["V11-1","Xâm phạm nhân cách và danh dự cá nhân","Nội dung lăng mạ, xúc phạm hoặc làm tổn hại đến nhân cách và danh dự của cá nhân."],
+  ["V11-2","Xâm phạm danh dự và uy tín của cơ quan, tổ chức","Nội dung làm tổn hại đến danh dự và uy tín của các cơ quan, tổ chức."],
+  ["V11-3","Thông tin sai sự thật, bóp méo và vu khống","Nội dung cung cấp thông tin sai lệch, bóp méo sự thật hoặc mang tính chất vu khống, bôi nhọ."],
+  ["V11-4","Xâm phạm đời tư và bí mật cá nhân, gia đình","Nội dung tiết lộ bí mật của cá nhân, gia đình hoặc xâm phạm đời tư cá nhân."]]}
+];
+const ALL_ITEMS = GROUPS.flatMap(g => g.items.map(i => i[0]));
+const MAX_CORE = 5;
+const CIRCLED = ["①","②","③","④","⑤"];
+const SCALE = ["Hoàn toàn không phù hợp","Không phù hợp","Bình thường","Phù hợp","Rất phù hợp"];
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const $ = s => document.querySelector(s);
+const form = $("#survey");
+
+/* ---------- render ---------- */
+function opts(el, name, list, type){
+  el.innerHTML = list.map(v => `<label class="opt"><input type="${type}" name="${name}" value="${esc(v)}"><span>${esc(v)}</span></label>`).join("");
+}
+opts($("#opts-field"), "field", FIELDS, "checkbox");
+opts($("#opts-exp"), "experience", EXPS, "radio");
+opts($("#opts-topik"), "topik_exp", TOPIKS, "checkbox");
+
+$("#ratings").innerHTML = GROUPS.map((g, gi) => `
+  <div class="group">
+    <h3>${g.id}. ${esc(g.name)}</h3>
+    ${g.items.map(([code, title, crit]) => `
+      <div class="item" id="item-${code}">
+        <div class="code">${code}</div>
+        <div><div class="title">${esc(title)}</div><div class="crit">${esc(crit)}</div></div>
+        <div class="likert" role="radiogroup" aria-label="Mức độ phù hợp ${code}">
+          ${[1,2,3,4,5].map(n => `<label title="${SCALE[n-1]}"><input type="radio" name="rate_${code}" value="${n}"><b>${CIRCLED[n-1]}</b></label>`).join("")}
+        </div>
+      </div>`).join("")}
+    <label class="field" for="comment_${g.id}">Câu hỏi mở ${gi + 1}. Xin Quý chuyên gia nêu những chủ đề, nội dung hoặc cách diễn đạt cụ thể thuộc nhóm trên cần đặc biệt lưu ý hoặc hạn chế trong đề thi TOPIK.</label>
+    <textarea id="comment_${g.id}" name="comment_${g.id}"></textarea>
+  </div>`).join("");
+
+$("#core").innerHTML = GROUPS.map(g => `
+  <div class="core-group"><h4>${g.id} ${esc(g.name)}</h4>
+  ${g.items.map(([code, title]) => `<label class="chk"><input type="checkbox" name="core" value="${code}"><span><b>${code}</b> ${esc(title)}</span></label>`).join("")}
+  </div>`).join("");
+
+function addRevRow(v = {}){
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td data-label="Mã tương ứng"><input type="text" name="rev_code" list="codeList" value="${esc(v.code||"")}"></td>
+    <td data-label="Ý kiến chỉnh sửa, tích hợp hoặc loại bỏ"><textarea name="rev_opinion">${esc(v.opinion||"")}</textarea></td>
+    <td data-label="Lý do"><textarea name="rev_reason">${esc(v.reason||"")}</textarea></td>`;
+  $("#revBody").appendChild(tr);
+}
+const dl = document.createElement("datalist"); dl.id = "codeList";
+dl.innerHTML = ALL_ITEMS.map(c => `<option value="${c}">`).join(""); document.body.appendChild(dl);
+$("#addRow").onclick = () => { addRevRow(); save(); };
+
+/* ---------- core max-5 ---------- */
+function updateCore(){
+  const boxes = [...form.querySelectorAll('input[name=core]')];
+  const n = boxes.filter(b => b.checked).length;
+  boxes.forEach(b => { const off = !b.checked && n >= MAX_CORE; b.disabled = off; b.parentElement.classList.toggle("disabled", off); });
+  $("#coreCount").textContent = `Đã chọn ${n}/${MAX_CORE}`;
+}
+
+/* ---------- collect ---------- */
+function collect(){
+  const fd = new FormData(form);
+  const d = {
+    survey_id: SURVEY_ID,
+    submitted_at: new Date().toISOString(),
+    org: (fd.get("org")||"").trim(),
+    field: fd.getAll("field"),
+    field_other: (fd.get("field_other")||"").trim(),
+    experience: fd.get("experience") || "",
+    topik_exp: fd.getAll("topik_exp"),
+    topik_other: (fd.get("topik_other")||"").trim(),
+    ratings: {}, comments: {},
+    core: fd.getAll("core"),
+    add_needed: fd.get("add_needed") || "",
+    add_content: (fd.get("add_content")||"").trim(),
+    add_reason: (fd.get("add_reason")||"").trim(),
+    revisions: [],
+    other_opinion: (fd.get("other_opinion")||"").trim()
+  };
+  ALL_ITEMS.forEach(c => d.ratings[c] = fd.get("rate_"+c) ? Number(fd.get("rate_"+c)) : null);
+  GROUPS.forEach(g => d.comments[g.id] = (fd.get("comment_"+g.id)||"").trim());
+  const codes = fd.getAll("rev_code"), ops = fd.getAll("rev_opinion"), rs = fd.getAll("rev_reason");
+  codes.forEach((c,i) => { if (c.trim()||ops[i].trim()||rs[i].trim()) d.revisions.push({code:c.trim(),opinion:ops[i].trim(),reason:rs[i].trim()}); });
+  return d;
+}
+
+/* flat row for CSV / Google Sheets */
+function flatten(d){
+  const r = {
+    submitted_at:d.submitted_at, org:d.org,
+    field:[...d.field, d.field_other && ("Khác: "+d.field_other)].filter(Boolean).join("; "),
+    experience:d.experience,
+    topik_exp:[...d.topik_exp, d.topik_other && ("Khác: "+d.topik_other)].filter(Boolean).join("; ")
+  };
+  ALL_ITEMS.forEach(c => r[c] = d.ratings[c] ?? "");
+  GROUPS.forEach(g => r["comment_"+g.id] = d.comments[g.id]);
+  r.core = d.core.join("; ");
+  ALL_ITEMS.forEach(c => r["core_"+c] = d.core.includes(c) ? 1 : 0);
+  r.add_needed = d.add_needed; r.add_content = d.add_content; r.add_reason = d.add_reason;
+  r.revisions = d.revisions.map(x => `[${x.code}] ${x.opinion} | Lý do: ${x.reason}`).join(" || ");
+  r.other_opinion = d.other_opinion;
+  return r;
+}
+
+/* ---------- autosave ---------- */
+const KEY = "survey:" + SURVEY_ID;
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(collect())); } catch(e){}
+  progress();
+}
+function restore(){
+  let d; try { d = JSON.parse(localStorage.getItem(KEY)||"null"); } catch(e){ d = null; }
+  if (!d){ addRevRow(); addRevRow(); addRevRow(); return; }
+  const setVal = (n,v) => { const el = form.elements[n]; if (el && v != null) el.value = v; };
+  setVal("org", d.org); setVal("field_other", d.field_other); setVal("topik_other", d.topik_other);
+  setVal("add_content", d.add_content); setVal("add_reason", d.add_reason); setVal("other_opinion", d.other_opinion);
+  const check = (n, vals) => form.querySelectorAll(`input[name="${n}"]`).forEach(i => i.checked = [].concat(vals).map(String).includes(i.value));
+  check("field", d.field||[]); check("topik_exp", d.topik_exp||[]); check("core", d.core||[]);
+  if (d.experience) check("experience", [d.experience]);
+  if (d.add_needed) check("add_needed", [d.add_needed]);
+  Object.entries(d.ratings||{}).forEach(([c,v]) => { if (v) check("rate_"+c, [v]); });
+  Object.entries(d.comments||{}).forEach(([g,v]) => setVal("comment_"+g, v));
+  const rows = (d.revisions||[]); rows.forEach(addRevRow);
+  for (let i = rows.length; i < 3; i++) addRevRow();
+}
+
+/* ---------- progress & validation ---------- */
+function problems(d){
+  const p = [];
+  if (!d.org) p.push({el:"#org", t:"Mục II.1 – Cơ quan/đơn vị công tác"});
+  if (!d.field.length && !d.field_other) p.push({el:"#opts-field", t:"Mục II.2 – Lĩnh vực chuyên môn"});
+  if (!d.experience) p.push({el:"#opts-exp", t:"Mục II.3 – Kinh nghiệm làm việc"});
+  if (!d.topik_exp.length && !d.topik_other) p.push({el:"#opts-topik", t:"Mục II.4 – Kinh nghiệm liên quan đến TOPIK"});
+  const miss = ALL_ITEMS.filter(c => !d.ratings[c]);
+  if (miss.length) p.push({el:"#item-"+miss[0], t:`Mục III – chưa đánh giá: ${miss.join(", ")}`, miss});
+  if (d.core.length > MAX_CORE) p.push({el:"#core", t:"Mục IV – chọn tối đa 5 mục"});
+  return p;
+}
+function progress(){
+  const d = collect();
+  const total = 4 + ALL_ITEMS.length;
+  const done = [d.org, d.field.length||d.field_other, d.experience, d.topik_exp.length||d.topik_other].filter(Boolean).length
+             + ALL_ITEMS.filter(c => d.ratings[c]).length;
+  const pct = Math.round(done/total*100);
+  $("#barFill").style.width = pct + "%";
+  $("#barText").textContent = `${pct}% câu hỏi bắt buộc đã trả lời`;
+}
+function showMsg(html, kind){ const m = $("#msg"); m.className = "msg show " + kind; m.innerHTML = html; }
+
+/* ---------- submit ---------- */
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+  document.querySelectorAll(".item.missing").forEach(x => x.classList.remove("missing"));
+  const d = collect(); const p = problems(d);
+  if (p.length){
+    (p.find(x => x.miss)?.miss||[]).forEach(c => document.getElementById("item-"+c)?.classList.add("missing"));
+    showMsg("<b>Vui lòng hoàn thành các mục sau:</b><br>" + p.map(x => "• " + esc(x.t)).join("<br>"), "err");
+    document.querySelector(p[0].el)?.scrollIntoView({behavior:"smooth", block:"center"});
+    return;
+  }
+  if (!SUBMIT_URL){
+    showMsg("Hệ thống chưa được cấu hình để nhận câu trả lời. Xin vui lòng liên hệ nhóm nghiên cứu. Câu trả lời của Quý chuyên gia vẫn được lưu tạm trên trình duyệt này.", "err");
+    return;
+  }
+  const btn = $("#submitBtn"); btn.disabled = true; btn.textContent = "Đang gửi…";
+  try {
+    await fetch(SUBMIT_URL, { method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify({ row: flatten(d), raw: d }) });
+    showMsg("Đã gửi thành công. Xin chân thành cảm ơn Quý chuyên gia đã tham gia khảo sát!", "ok");
+    try { localStorage.removeItem(KEY); } catch(e){}
+    btn.textContent = "Đã gửi";
+  } catch(err){
+    btn.disabled = false; btn.textContent = "Gửi khảo sát";
+    showMsg("Không gửi được do lỗi mạng. Câu trả lời vẫn được lưu tạm, xin vui lòng kiểm tra kết nối và bấm “Gửi khảo sát” lại.", "err");
+  }
+});
+
+/* ---------- init ---------- */
+restore(); updateCore(); progress();
+form.addEventListener("input", e => { if (e.target.name === "core") updateCore(); save(); });
+form.addEventListener("change", e => { if (e.target.name === "core") updateCore(); save(); });
+</script>
+</body>
+</html>
